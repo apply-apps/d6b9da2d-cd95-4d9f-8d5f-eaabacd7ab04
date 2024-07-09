@@ -1,14 +1,12 @@
 // Filename: index.js
 // Combined code from all files
-
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator, Switch, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { NavigationContainer, useNavigation, useRoute, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 function extractTitle(story) {
-    // Extract the first sentence or a few words from the story as its title
     return story.split('.')[0].slice(0, 20) + '...';
 }
 
@@ -96,7 +94,6 @@ function HomeScreen({ navigation }) {
 }
 
 function StoryDetailScreen({ route }) {
-    const navigation = useNavigation();
     const { story, isDarkMode } = route.params;
     const backgroundColor = isDarkMode ? '#333333' : '#FFFFFF';
     const textColor = isDarkMode ? '#FFFFFF' : '#000000';
@@ -119,9 +116,20 @@ export default function App() {
 
     return (
         <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
-            <Stack.Navigator>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="StoryDetail" component={StoryDetailScreen} />
+            <Stack.Navigator
+                screenOptions={{
+                    headerStyle: {
+                        backgroundColor: isDarkMode ? '#333333' : '#FFFFFF',
+                    },
+                    headerTintColor: isDarkMode ? '#FFFFFF' : '#000000',
+                }}
+            >
+                <Stack.Screen name="Home">
+                    {props => <HomeScreen {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="StoryDetail">
+                    {props => <StoryDetailScreen {...props} />}
+                </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
     );
