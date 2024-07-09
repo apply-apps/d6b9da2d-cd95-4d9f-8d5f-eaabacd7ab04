@@ -1,10 +1,16 @@
 // Filename: index.js
 // Combined code from all files
+
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator, Switch, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, useRoute, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+
+function extractTitle(story) {
+    // Extract the first sentence or a few words from the story as its title
+    return story.split('.')[0].slice(0, 20) + '...';
+}
 
 function HomeScreen({ navigation }) {
     const [heroes, setHeroes] = useState('');
@@ -25,7 +31,8 @@ function HomeScreen({ navigation }) {
                 model: "gpt-4o"
             });
             const resultString = response.data.response;
-            setStories([...stories, { title: `Story ${stories.length + 1}`, content: resultString }]);
+            const title = extractTitle(resultString);
+            setStories([...stories, { title, content: resultString }]);
         } catch (error) {
             console.error(error);
         } finally {
@@ -68,7 +75,7 @@ function HomeScreen({ navigation }) {
                     <ActivityIndicator size="large" color={textColor} style={styles.loading} />
                 ) : (
                     stories.map((story, index) => (
-                        <TouchableOpacity key={index} onPress={() => navigation.navigate('StoryDetail', { story })}>
+                        <TouchableOpacity key={index} onPress={() => navigation.navigate('StoryDetail', { story, isDarkMode })}>
                             <Text style={[styles.storyTitle, { color: textColor }]}>{story.title}</Text>
                         </TouchableOpacity>
                     ))
@@ -88,13 +95,17 @@ function HomeScreen({ navigation }) {
     );
 }
 
-function StoryDetailScreen({ route, navigation }) {
-    const { story } = route.params;
+function StoryDetailScreen({ route }) {
+    const navigation = useNavigation();
+    const { story, isDarkMode } = route.params;
+    const backgroundColor = isDarkMode ? '#333333' : '#FFFFFF';
+    const textColor = isDarkMode ? '#FFFFFF' : '#000000';
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.title}>{story.title}</Text>
-                <Text style={styles.story}>{story.content}</Text>
+                <Text style={[styles.title, { color: textColor }]}>{story.title}</Text>
+                <Text style={[styles.story, { color: textColor }]}>{story.content}</Text>
                 <Button title="Back" onPress={() => navigation.goBack()} />
             </ScrollView>
         </SafeAreaView>
@@ -104,8 +115,10 @@ function StoryDetailScreen({ route, navigation }) {
 const Stack = createStackNavigator();
 
 export default function App() {
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
             <Stack.Navigator>
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="StoryDetail" component={StoryDetailScreen} />
