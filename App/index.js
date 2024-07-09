@@ -1,16 +1,17 @@
 // Filename: index.js
 // Combined code from all files
-
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator, Switch } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator, Switch, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function App() {
+function HomeScreen({ navigation }) {
     const [heroes, setHeroes] = useState('');
     const [villains, setVillains] = useState('');
     const [plot, setPlot] = useState('');
     const [loading, setLoading] = useState(false);
-    const [story, setStory] = useState('');
+    const [stories, setStories] = useState([]);
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     const generateStory = async () => {
@@ -24,10 +25,9 @@ export default function App() {
                 model: "gpt-4o"
             });
             const resultString = response.data.response;
-            setStory(resultString);
+            setStories([...stories, { title: `Story ${stories.length + 1}`, content: resultString }]);
         } catch (error) {
             console.error(error);
-            setStory("An error occurred while generating the story.");
         } finally {
             setLoading(false);
         }
@@ -67,7 +67,11 @@ export default function App() {
                 {loading ? (
                     <ActivityIndicator size="large" color={textColor} style={styles.loading} />
                 ) : (
-                    <Text style={[styles.story, { color: textColor }]}>{story}</Text>
+                    stories.map((story, index) => (
+                        <TouchableOpacity key={index} onPress={() => navigation.navigate('StoryDetail', { story })}>
+                            <Text style={[styles.storyTitle, { color: textColor }]}>{story.title}</Text>
+                        </TouchableOpacity>
+                    ))
                 )}
                 <View style={styles.switchContainer}>
                     <Text style={[styles.switchLabel, { color: textColor }]}>Dark Mode</Text>
@@ -81,6 +85,32 @@ export default function App() {
                 </View>
             </ScrollView>
         </SafeAreaView>
+    );
+}
+
+function StoryDetailScreen({ route, navigation }) {
+    const { story } = route.params;
+    return (
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Text style={styles.title}>{story.title}</Text>
+                <Text style={styles.story}>{story.content}</Text>
+                <Button title="Back" onPress={() => navigation.goBack()} />
+            </ScrollView>
+        </SafeAreaView>
+    );
+}
+
+const Stack = createStackNavigator();
+
+export default function App() {
+    return (
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="StoryDetail" component={StoryDetailScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
     );
 }
 
@@ -113,6 +143,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 24,
         textAlign: 'left',
+    },
+    storyTitle: {
+        fontSize: 18,
+        marginTop: 10,
+        textDecorationLine: 'underline',
     },
     switchContainer: {
         marginTop: 20,
