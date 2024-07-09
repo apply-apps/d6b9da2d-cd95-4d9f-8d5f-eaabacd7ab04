@@ -2,8 +2,7 @@
 // Combined code from all files
 
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator } from 'react-native';
-import Slider from '@react-native-community/slider';
+import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator, Switch } from 'react-native';
 import axios from 'axios';
 
 export default function App() {
@@ -12,7 +11,7 @@ export default function App() {
     const [plot, setPlot] = useState('');
     const [loading, setLoading] = useState(false);
     const [story, setStory] = useState('');
-    const [brightness, setBrightness] = useState(1);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const generateStory = async () => {
         setLoading(true);
@@ -34,47 +33,50 @@ export default function App() {
         }
     };
 
-    const backgroundColor = `rgba(255, 255, 255, ${(brightness).toFixed(1)})`; // Adjust background color based on brightness
+    const toggleSwitch = () => setIsDarkMode(previousState => !previousState);
+
+    const backgroundColor = isDarkMode ? '#333333' : '#FFFFFF';
+    const textColor = isDarkMode ? '#FFFFFF' : '#000000';
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.title}>Fairy Tale Generator</Text>
+                <Text style={[styles.title, { color: textColor }]}>Fairy Tale Generator</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: textColor, borderColor: textColor }]}
                     placeholder="Enter Heroes..."
+                    placeholderTextColor={isDarkMode ? '#CCCCCC' : '#999999'}
                     value={heroes}
                     onChangeText={setHeroes}
                 />
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: textColor, borderColor: textColor }]}
                     placeholder="Enter Villains..."
+                    placeholderTextColor={isDarkMode ? '#CCCCCC' : '#999999'}
                     value={villains}
                     onChangeText={setVillains}
                 />
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: textColor, borderColor: textColor }]}
                     placeholder="Enter Plot..."
+                    placeholderTextColor={isDarkMode ? '#CCCCCC' : '#999999'}
                     value={plot}
                     onChangeText={setPlot}
                 />
                 <Button title="Generate Fairy Tale" onPress={generateStory} />
                 {loading ? (
-                    <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />
+                    <ActivityIndicator size="large" color={textColor} style={styles.loading} />
                 ) : (
-                    <Text style={styles.story}>{story}</Text>
+                    <Text style={[styles.story, { color: textColor }]}>{story}</Text>
                 )}
-                <View style={styles.sliderContainer}>
-                    <Text style={styles.sliderLabel}>Brightness</Text>
-                    <Slider
-                        style={styles.slider}
-                        minimumValue={0}
-                        maximumValue={1}
-                        value={brightness}
-                        onValueChange={setBrightness}
-                        minimumTrackTintColor="#000000"
-                        maximumTrackTintColor="#FFFFFF"
-                        thumbTintColor="#000000"
+                <View style={styles.switchContainer}>
+                    <Text style={[styles.switchLabel, { color: textColor }]}>Dark Mode</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleSwitch}
+                        value={isDarkMode}
                     />
                 </View>
             </ScrollView>
@@ -100,7 +102,6 @@ const styles = StyleSheet.create({
     input: {
         padding: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
         borderRadius: 5,
         marginBottom: 15,
     },
@@ -113,16 +114,12 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         textAlign: 'left',
     },
-    sliderContainer: {
+    switchContainer: {
         marginTop: 20,
         alignItems: 'center',
     },
-    sliderLabel: {
+    switchLabel: {
         fontSize: 16,
         marginBottom: 10,
-    },
-    slider: {
-        width: '100%',
-        height: 40,
     },
 });
