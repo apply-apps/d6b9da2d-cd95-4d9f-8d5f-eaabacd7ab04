@@ -1,8 +1,8 @@
 // Filename: index.js
 // Combined code from all files
-
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator } from 'react-native';
+import Slider from '@react-native-community/slider';
 import axios from 'axios';
 
 export default function App() {
@@ -11,6 +11,7 @@ export default function App() {
     const [plot, setPlot] = useState('');
     const [loading, setLoading] = useState(false);
     const [story, setStory] = useState('');
+    const [brightness, setBrightness] = useState(1);
 
     const generateStory = async () => {
         setLoading(true);
@@ -32,8 +33,10 @@ export default function App() {
         }
     };
 
+    const backgroundColor = `rgba(0, 0, 0, ${(1 - brightness).toFixed(1)})`; // Adjust background color based on brightness
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.title}>Fairy Tale Generator</Text>
                 <TextInput
@@ -60,6 +63,19 @@ export default function App() {
                 ) : (
                     <Text style={styles.story}>{story}</Text>
                 )}
+                <View style={styles.sliderContainer}>
+                    <Text style={styles.sliderLabel}>Brightness</Text>
+                    <Slider
+                        style={styles.slider}
+                        minimumValue={0}
+                        maximumValue={1}
+                        value={brightness}
+                        onValueChange={setBrightness}
+                        minimumTrackTintColor="#FFFFFF"
+                        maximumTrackTintColor="#000000"
+                        thumbTintColor="#000000"
+                    />
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -68,7 +84,6 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f8f8',
         paddingTop: 20,
     },
     scrollContent: {
@@ -96,5 +111,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 24,
         textAlign: 'left',
+    },
+    sliderContainer: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    sliderLabel: {
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    slider: {
+        width: '100%',
+        height: 40,
     },
 });
