@@ -1,5 +1,6 @@
 // Filename: index.js
 // Combined code from all files
+
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -18,7 +19,7 @@ export default function App() {
         try {
             const response = await axios.post('http://apihub.p.appply.xyz:3300/chatgpt', {
                 messages: [
-                    { role: "system", content: "You are a helpful assistant. Please create a fairy tale based on the given heroes, villains, and plot" },
+                    { role: "system", content: "You are a helpful assistant. Please create a fairy tale based on the given heroes, villains, and plot." },
                     { role: "user", content: `Heroes: ${heroes}, Villains: ${villains}, Plot: ${plot}` }
                 ],
                 model: "gpt-4o"
@@ -33,7 +34,7 @@ export default function App() {
         }
     };
 
-    const backgroundColor = `rgba(0, 0, 0, ${(1 - brightness).toFixed(1)})`; // Adjust background color based on brightness
+    const backgroundColor = `rgba(255, 255, 255, ${(brightness).toFixed(1)})`; // Adjust background color based on brightness
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -71,8 +72,8 @@ export default function App() {
                         maximumValue={1}
                         value={brightness}
                         onValueChange={setBrightness}
-                        minimumTrackTintColor="#FFFFFF"
-                        maximumTrackTintColor="#000000"
+                        minimumTrackTintColor="#000000"
+                        maximumTrackTintColor="#FFFFFF"
                         thumbTintColor="#000000"
                     />
                 </View>
