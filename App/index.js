@@ -1,17 +1,16 @@
 // Filename: index.js
 // Combined code from all files
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, ScrollView, View, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
 
 export default function App() {
-    const [heroes, setHeroes] = React.useState('');
-    const [villains, setVillains] = React.useState('');
-    const [plot, setPlot] = React.useState('');
-    const [loading, setLoading] = React.useState(false);
-    const [story, setStory] = React.useState('');
+    const [heroes, setHeroes] = useState('');
+    const [villains, setVillains] = useState('');
+    const [plot, setPlot] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [story, setStory] = useState('');
 
     const generateStory = async () => {
         setLoading(true);
@@ -23,8 +22,8 @@ export default function App() {
                 ],
                 model: "gpt-4o"
             });
-            const { text: story } = response.data.response;
-            setStory(story);
+            const resultString = response.data.response;
+            setStory(resultString);
         } catch (error) {
             console.error(error);
             setStory("An error occurred while generating the story.");
